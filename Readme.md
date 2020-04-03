@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Nikita](https://up.htmlacademy.ru/ecmascript/11/user/868387).
-* Наставник: `Неизвестно`.
+* Наставник: [Виктор](https://htmlacademy.ru/profile/id241239).
 
 ---
 
