@@ -7,9 +7,9 @@ import {createTripDaysTemplate} from "./components/trip-days.js";
 import {createDayTemplate} from "./components/day.js";
 import {createPointTemplate} from "./components/point.js";
 import {createEditEventTemplate} from "./components/edit.js";
-import {createOffers} from "./components/offers.js";
-import {mockData, totalCost, editPointData, travelDays, formatDate} from "./mock/mock.js";
-
+import {createPointOffers, createEditOffers} from "./components/offers.js";
+import {pointData, editData, totalCost, travelDays} from "./mock/mock.js";
+import {getRandomItemArr} from "./helpers/utils.js";
 
 const tripMainContainer = document.querySelector(`.trip-main`);
 const tripControlsContainer = document.querySelector(`.trip-controls`);
@@ -28,27 +28,55 @@ render(tripControlsContainer, createMenuTemplate(), `beforeend`);
 render(tripControlsContainer, createFiltersTemplate(), `beforeend`);
 render(tripEventsContainer, createSortTemplate(), `afterbegin`);
 
-render(tripEventsContainer, createEditEventTemplate(editPointData), `beforeend`);
+render(tripEventsContainer, createEditEventTemplate(editData), `beforeend`);
+
+
+const editOffersContainer = document.querySelector(`.event__available-offers`);
+
+editData.offers.forEach(function (element, index) {
+  const checkStatus = [true, false];
+  let status = String;
+  if (getRandomItemArr(checkStatus) === true) {
+    status = `checked`;
+  } else {
+    status = ``;
+  }
+
+  render(editOffersContainer, createEditOffers(element, index + 1, status), `beforeend`);
+});
+
+
+// const editOffers = [];
+
+
+// for (let i = 0; i < data.length; i++) {
+//   if (getRandomItemArr(checkStatus) === true) {
+//     status = `checked`;
+//   } else {
+//     status = ``;
+//   }
+
+//   editOffers.push();
+// }
+
 
 render(tripEventsContainer, createTripDaysTemplate(), `beforeend`);
 
-for (let i = 0; i < travelDays.length; i++) {
-  let dateIndex = 1;
-  const day = createDayTemplate(formatDate(new Date(travelDays[i]), `day`), formatDate(new Date(travelDays[i]), `datetimeDay`), dateIndex + i);
+travelDays.forEach(function (item, index) {
   const tripDaysList = document.querySelector(`.trip-days`);
-  render(tripDaysList, day, `beforeend`);
-  const pointContainer = document.querySelector(`.day:last-child .trip-events__list`);
+  render(tripDaysList, createDayTemplate(new Date(item), 1 + index), `beforeend`);
+  const lastDay = document.querySelector(`.day:last-child`);
+  const pointContainer = lastDay.querySelector(`.trip-events__list`);
 
-  for (const element of mockData) {
-
-    if (new Date(element.startDay).toDateString() === travelDays[i]) {
+  pointData.forEach(function (element) {
+    if (element.startPointDate.toDateString() === item) {
       render(pointContainer, createPointTemplate(element), `beforeend`);
 
-      const offersContainer = document.querySelector(`.day:last-child .trip-events__item:last-child .event__selected-offers`);
+      const offersContainer = lastDay.querySelector(`.trip-events__item:last-child .event__selected-offers`);
 
-      for (let j = 0; j <= element.offers.length - 1; j++) {
-        render(offersContainer, createOffers(element.offers[j]), `beforeend`);
-      }
+      element.offers.forEach(function (object) {
+        render(offersContainer, createPointOffers(object), `beforeend`);
+      });
     }
-  }
-}
+  });
+});
