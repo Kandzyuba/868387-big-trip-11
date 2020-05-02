@@ -1,82 +1,72 @@
-import {createInfoTemplate} from "./components/information.js";
-import {createCostTemplate} from "./components/cost.js";
-import {createMenuTemplate} from "./components/menu.js";
-import {createFiltersTemplate} from "./components/filters.js";
-import {createSortTemplate} from "./components/sort.js";
-import {createTripDaysTemplate} from "./components/trip-days.js";
-import {createDayTemplate} from "./components/day.js";
-import {createPointTemplate} from "./components/point.js";
-import {createEditEventTemplate} from "./components/edit.js";
-import {createPointOffers, createEditOffers} from "./components/offers.js";
-import {pointData, editData, totalCost, travelDays} from "./mock/mock.js";
-import {getRandomItemArr} from "./helpers/utils.js";
+import InfoComponent from "./components/information.js";
+import CostComponent from "./components/cost.js";
+import MenuComponent from "./components/menu.js";
+import FiltersComponent from "./components/filters.js";
+import SortComponent from "./components/sort.js";
+import TripDaysComponent from "./components/trip-days.js";
+import DayComponent from "./components/day.js";
+import PointComponent from "./components/point.js";
+import EditComponent from "./components/edit.js";
+import {pointData, totalCost, travelDays} from "./mock/mock.js";
+import {render, RenderPosition} from "./helpers/utils.js";
 
 const tripMainContainer = document.querySelector(`.trip-main`);
 const tripControlsContainer = document.querySelector(`.trip-controls`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
-
-render(tripMainContainer, createInfoTemplate(), `afterbegin`);
+render(tripMainContainer, new InfoComponent().getElement(), RenderPosition.AFTERBEGIN);
 const tripInfoContainer = document.querySelector(`.trip-info`);
 
-render(tripInfoContainer, createCostTemplate(totalCost), `beforeend`);
+render(tripInfoContainer, new CostComponent(totalCost).getElement(), RenderPosition.BEFOREEND);
 
-render(tripControlsContainer, createMenuTemplate(), `beforeend`);
-render(tripControlsContainer, createFiltersTemplate(), `beforeend`);
-render(tripEventsContainer, createSortTemplate(), `afterbegin`);
+render(tripControlsContainer, new MenuComponent().getElement(), RenderPosition.BEFOREEND);
+render(tripControlsContainer, new FiltersComponent().getElement(), RenderPosition.BEFOREEND);
+render(tripEventsContainer, new SortComponent().getElement(), RenderPosition.AFTERBEGIN);
 
-render(tripEventsContainer, createEditEventTemplate(editData), `beforeend`);
+// render(tripEventsContainer, new EditComponent(editData).getElement(), RenderPosition.BEFOREEND);
+
+render(tripEventsContainer, new TripDaysComponent().getElement(), RenderPosition.BEFOREEND);
+
+const renderPoint = (pointListElement, element) => {
+  const onEditButtonClick = () => {
+    pointListElement.replaceChild(editComponent.getElement(), pointComponent.getElement());
+  };
+
+  const onEditFormSubmit = (evt) => {
+    evt.preventDefault();
+    pointListElement.replaceChild(pointComponent.getElement(), editComponent.getElement());
+  };
+
+  const pointComponent = new PointComponent(element);
+
+  const editButton = pointComponent.getElement().querySelector(`.event__rollup-btn`);
+  editButton.addEventListener(`click`, onEditButtonClick);
 
 
-const editOffersContainer = document.querySelector(`.event__available-offers`);
-
-editData.offers.forEach(function (element, index) {
-  const checkStatus = [true, false];
-  let status = String;
-  if (getRandomItemArr(checkStatus) === true) {
-    status = `checked`;
-  } else {
-    status = ``;
+  const editComponent = new EditComponent(element);
+  const editForm = editComponent.getElement().querySelector(`.trip-event__list`);
+  if (editForm !== null) {
+    editForm.addEventListener(`submit`, onEditFormSubmit);
   }
-
-  render(editOffersContainer, createEditOffers(element, index + 1, status), `beforeend`);
-});
+  render(pointListElement, pointComponent.getElement(), RenderPosition.BEFOREEND);
 
 
-// const editOffers = [];
+};
 
 
-// for (let i = 0; i < data.length; i++) {
-//   if (getRandomItemArr(checkStatus) === true) {
-//     status = `checked`;
-//   } else {
-//     status = ``;
-//   }
-
-//   editOffers.push();
-// }
-
-
-render(tripEventsContainer, createTripDaysTemplate(), `beforeend`);
-
-travelDays.forEach(function (item, index) {
+travelDays.forEach((item, index) => {
   const tripDaysList = document.querySelector(`.trip-days`);
-  render(tripDaysList, createDayTemplate(new Date(item), 1 + index), `beforeend`);
+  render(tripDaysList, new DayComponent(new Date(item), 1 + index).getElement(), RenderPosition.BEFOREEND);
   const lastDay = document.querySelector(`.day:last-child`);
   const pointContainer = lastDay.querySelector(`.trip-events__list`);
 
-  pointData.forEach(function (element) {
+  pointData.forEach((element) => {
     if (element.startPointDate.toDateString() === item) {
-      render(pointContainer, createPointTemplate(element), `beforeend`);
+      // render(pointContainer, new PointComponent(element).getElement(), RenderPosition.BEFOREEND);
+      // render(tripEventsContainer, new EditComponent(editData).getElement(), RenderPosition.BEFOREEND);
 
-      const offersContainer = lastDay.querySelector(`.trip-events__item:last-child .event__selected-offers`);
-
-      element.offers.forEach(function (object) {
-        render(offersContainer, createPointOffers(object), `beforeend`);
-      });
+      renderPoint(pointContainer, element);
     }
   });
 });
+

@@ -1,8 +1,39 @@
-import {formatDate} from "../helpers/utils.js";
-export const createEditEventTemplate = (data) => {
-  const {type, city, startPointDate, endPointDate, price, destination, photos} = data;
+import {formatDate, createElement} from "../helpers/utils.js";
+
+const createEditEventTemplate = (editData) => {
+  const {type, city, startPointDate, endPointDate, price, destination, photos, offers} = editData;
   const formattedStartDate = formatDate(startPointDate, `edit`);
   const formattedFinishDate = formatDate(endPointDate, `edit`);
+
+  const getEditOffers = (data) => {
+    return data.map((offer, index) => {
+      const {information, cost, statusFlag} = offer;
+      let switchCheck = `checked`;
+      if (!statusFlag) {
+        switchCheck = ``;
+      }
+      return (
+        `<div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${index + 1}" type="checkbox" name="event-offer-${index}" ${switchCheck}>
+          <label class="event__offer-label" for="event-offer-${index + 1}">
+            <span class="event__offer-title">${information}</span>
+            &plus;
+            &euro;&nbsp;<span class="event__offer-price">${cost}</span>
+          </label>
+        </div>`
+      );
+    });
+  };
+
+  const editOffers = getEditOffers(offers);
+
+  const getEditPhotos = (editPhotos) => {
+    return editPhotos.map((element) => {
+      return (`<img class="event__photo" src="${element}" alt="Event photo">`);
+    });
+  };
+
+  const photoTemplate = getEditPhotos(photos);
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -116,7 +147,7 @@ export const createEditEventTemplate = (data) => {
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
-
+            ${editOffers}
           </div>
         </section>
 
@@ -126,7 +157,7 @@ export const createEditEventTemplate = (data) => {
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
-              ${photos}
+              ${photoTemplate}
             </div>
           </div>
         </section>
@@ -134,3 +165,26 @@ export const createEditEventTemplate = (data) => {
     </form>`
   );
 };
+
+export default class Point {
+  constructor(data) {
+    this._data = data;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditEventTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
