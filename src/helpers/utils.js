@@ -1,16 +1,30 @@
-const getRandomNumber = (min, max) => {
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
+
+export const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN: container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND: container.append(element);
+      break;
+  }
+};
+
+export const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
-const getRandomDate = () => {
+export const getRandomDate = () => {
   return Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * getRandomNumber(0, 60) * 60 * 1000;
 };
 
-const getRandomItemArr = (arr) => {
+export const getRandomItemArr = (arr) => {
   return arr[Math.floor(Math.random() * arr.length)];
 };
 
-const getRandomElements = (data) => {
+export const getRandomElements = (data) => {
   const offersPoint = [];
 
   for (let i = 0; i < getRandomNumber(1, 4); i++) {
@@ -19,7 +33,7 @@ const getRandomElements = (data) => {
   return offersPoint;
 };
 
-const getRandomPhoto = () => {
+export const getRandomPhoto = () => {
   const photos = [];
 
   for (let i = 0; i < getRandomNumber(1, 5); i++) {
@@ -29,16 +43,7 @@ const getRandomPhoto = () => {
   return photos;
 };
 
-const getEditPhotos = (photos) => {
-  const photoTemplate = [];
-  for (let i = 0; i < photos.length; i++) {
-    photoTemplate.push(`<img class="event__photo" src="${photos[i]}" alt="Event photo">`);
-  }
-
-  return photoTemplate;
-};
-
-const getPointTime = (date) => {
+export const getPointTime = (date) => {
   let delta = Math.floor(date) / 1000;
   const days = Math.floor(delta / 86400);
   delta -= days * 86400;
@@ -56,11 +61,11 @@ const getPointTime = (date) => {
   }
 };
 
-const getCost = (accumulator, currentValue) => {
+export const getCost = (accumulator, currentValue) => {
   return accumulator + currentValue.price;
 };
 
-const formatDate = (date, section) => {
+export const formatDate = (date, section) => {
   const year = date.getFullYear();
   const month = (`0` + date.getMonth()).slice(-2);
   const day = (`0` + date.getDate()).slice(-2);
@@ -76,4 +81,10 @@ const formatDate = (date, section) => {
   }
 };
 
-export {getRandomNumber, getRandomDate, getRandomItemArr, getRandomElements, getRandomPhoto, getEditPhotos, getPointTime, formatDate, getCost};
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
