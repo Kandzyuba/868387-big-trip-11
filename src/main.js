@@ -39,20 +39,16 @@ const renderPoint = (pointListElement, element) => {
 
   const pointComponent = new PointComponent(element);
 
-  const editButton = pointComponent.getElement().querySelector(`.event__rollup-btn`);
-  editButton.addEventListener(`click`, onEditButtonClick);
+  pointComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, onEditButtonClick);
 
 
   const editComponent = new EditComponent(element);
-  const editForm = editComponent.getElement().querySelector(`.trip-event__list`);
-  if (editForm !== null) {
-    editForm.addEventListener(`submit`, onEditFormSubmit);
-  }
+
+  editComponent.getElement().querySelector(`form`).addEventListener(`submit`, onEditFormSubmit);
+
   render(pointListElement, pointComponent.getElement(), RenderPosition.BEFOREEND);
 
-
 };
-
 
 travelDays.forEach((item, index) => {
   const tripDaysList = document.querySelector(`.trip-days`);
@@ -60,13 +56,12 @@ travelDays.forEach((item, index) => {
   const lastDay = document.querySelector(`.day:last-child`);
   const pointContainer = lastDay.querySelector(`.trip-events__list`);
 
-  pointData.forEach((element) => {
-    if (element.startPointDate.toDateString() === item) {
-      // render(pointContainer, new PointComponent(element).getElement(), RenderPosition.BEFOREEND);
-      // render(tripEventsContainer, new EditComponent(editData).getElement(), RenderPosition.BEFOREEND);
+  let filteredArr = pointData.filter((element) => {
+    return new Date(element.startPointDate).toDateString() === item;
+  });
 
-      renderPoint(pointContainer, element);
-    }
+  filteredArr.forEach((element) => {
+    renderPoint(pointContainer, element);
   });
 });
 

@@ -18,8 +18,8 @@ const createPointTemplate = (point) => {
   };
 
   const pointOffers = getOffers(offers);
-  const formattedStartDate = formatDate(startPointDate, `point`);
-  const formattedFinishDate = formatDate(endPointDate, `point`);
+  const formattedStartDate = formatDate(new Date(startPointDate), `point`);
+  const formattedFinishDate = formatDate(new Date(endPointDate), `point`);
   const imgType = type.toLowerCase();
 
   return (

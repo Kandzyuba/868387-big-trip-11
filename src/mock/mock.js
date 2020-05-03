@@ -17,10 +17,8 @@ const getpointData = () => {
     type: getRandomItemArr(types),
     city: getRandomItemArr(cities),
     price: getRandomNumber(20, 550),
-    startDay: Math.min(startDate, endDate),
-    endDay: Math.max(startDate, endDate),
-    startPointDate: new Date(Math.min(startDate, endDate)),
-    endPointDate: new Date(Math.max(startDate, endDate)),
+    startPointDate: Math.min(startDate, endDate),
+    endPointDate: Math.max(startDate, endDate),
     timePosition: getPointTime(new Date(endDate) - new Date(startDate)),
     offers: getRandomElements(offers),
     destination: getRandomItemArr(destinations),
@@ -37,8 +35,8 @@ for (let i = 0; i < POINTS_AMOUNT; i++) {
 let initialValue = 0;
 let totalCost = pointData.reduce(getCost, initialValue);
 
-pointData.sort((current, next) => current.startDay - next.startDay);
+pointData.sort((current, next) => current.startPointDate - next.startPointDate);
 
-const travelDays = [...new Set(pointData.map((item) => new Date(item.startDay).toDateString()))];
+const travelDays = [...new Set(pointData.map((item) => new Date(item.startPointDate).toDateString()))];
 
 export {pointData, totalCost, travelDays};
