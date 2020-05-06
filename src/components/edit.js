@@ -1,4 +1,5 @@
-import {formatDate, createElement} from "../helpers/utils.js";
+import {formatDate} from "../utils/common.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createEditEventTemplate = (editData) => {
   const {type, city, startPointDate, endPointDate, price, destination, photos, offers} = editData;
@@ -168,25 +169,17 @@ const createEditEventTemplate = (editData) => {
   );
 };
 
-export default class Edit {
+export default class Edit extends AbstractComponent {
   constructor(data) {
+    super();
     this._data = data;
-    this._element = null;
   }
 
   getTemplate() {
     return createEditEventTemplate(this._data);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
   }
 }

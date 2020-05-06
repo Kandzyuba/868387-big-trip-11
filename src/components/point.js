@@ -1,4 +1,5 @@
-import {formatDate, createElement} from "../helpers/utils.js";
+import {formatDate} from "../utils/common.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createPointTemplate = (point) => {
   const {type, city, startPointDate, endPointDate, timePosition, price, offers} = point;
@@ -56,25 +57,17 @@ const createPointTemplate = (point) => {
   );
 };
 
-export default class Point {
+export default class Point extends AbstractComponent {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 }

@@ -1,4 +1,4 @@
-import {getRandomNumber, getRandomDate, getRandomItemArr, getRandomElements, getRandomPhoto, getPointTime, getCost} from "./../helpers/utils.js";
+import {getRandomNumber, getRandomDate, getRandomItemArr, getRandomElements, getRandomPhoto, getPointTime, getCost} from "./../utils/common.js";
 const switchStatus = [true, false];
 const offers = [{information: `Cap of Tea`, cost: 3, statusFlag: getRandomItemArr(switchStatus)}, {information: `lunch`, cost: 15, statusFlag: getRandomItemArr(switchStatus)}, {information: `Change musik`, cost: 5, statusFlag: getRandomItemArr(switchStatus)}, {information: `Switch to comfort`, cost: 80, statusFlag: getRandomItemArr(switchStatus)}];
 const types = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`];
@@ -37,6 +37,5 @@ let totalCost = pointData.reduce(getCost, initialValue);
 
 pointData.sort((current, next) => current.startPointDate - next.startPointDate);
 
-const travelDays = [...new Set(pointData.map((item) => new Date(item.startPointDate).toDateString()))];
 
-export {pointData, totalCost, travelDays};
+export {pointData, totalCost};
