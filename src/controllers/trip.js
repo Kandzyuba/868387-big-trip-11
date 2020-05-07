@@ -20,22 +20,33 @@ const renderPoints = (points) => {
     });
 
     filteredArr.forEach((element) => {
-      const onEditButtonClick = () => {
+
+      const replacePointToEdit = () => {
         replace(editComponent, pointComponent);
+        document.addEventListener(`keydown`, onEscKeyDown);
       };
 
-      const onEditFormSubmit = (evt) => {
-        evt.preventDefault();
+      const replaceEditToPoint = () => {
         replace(pointComponent, editComponent);
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      };
+
+      const onEscKeyDown = (evt) => {
+        const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+        if (isEscKey) {
+          replaceEditToPoint();
+          document.removeEventListener(`keydown`, onEscKeyDown);
+        }
       };
 
       const pointComponent = new PointComponent(element);
 
-      pointComponent.setEditButtonClickHandler(onEditButtonClick);
+      pointComponent.setEditButtonClickHandler(replacePointToEdit);
 
       const editComponent = new EditComponent(element);
 
-      editComponent.setSubmitHandler(onEditFormSubmit);
+      editComponent.setSubmitHandler(replaceEditToPoint);
 
       render(pointContainer, pointComponent, RenderPosition.BEFOREEND);
     });
