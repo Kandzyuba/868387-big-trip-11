@@ -8,10 +8,7 @@ import {replace, render, RenderPosition} from "../utils/render.js";
 
 
 const renderPoints = (points) => {
-  if (points.length === 0) {
-    const tripEventsContainer = document.querySelector(`.trip-events`);
-    render(tripEventsContainer, new NoPointsComponent(), RenderPosition.BEFOREEND);
-  } else {
+
     const travelDays = [...new Set(points.map((item) => new Date(item.startPointDate).toDateString()))];
 
     travelDays.forEach((item, index) => {
@@ -54,7 +51,6 @@ const renderPoints = (points) => {
         render(pointContainer, pointComponent, RenderPosition.BEFOREEND);
       });
     });
-  }
 };
 
 export default class TripController {
@@ -68,6 +64,12 @@ export default class TripController {
     const container = this._container;
     render(container, this._sortComponent, RenderPosition.AFTERBEGIN);
     render(container, this._tripDays, RenderPosition.BEFOREEND);
-    renderPoints(points);
+    
+    if (points.length === 0) {
+      const tripEventsContainer = document.querySelector(`.trip-events`);
+      render(tripEventsContainer, new NoPointsComponent(), RenderPosition.BEFOREEND);
+    } else {
+      renderPoints(points);
+    }
   }
 }
