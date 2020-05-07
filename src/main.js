@@ -2,7 +2,7 @@
 import InfoComponent from "./components/information.js";
 import CostComponent from "./components/cost.js";
 import MenuComponent from "./components/menu.js";
-import NoPointsComponent from "./components/no-points.js";
+
 import FiltersComponent from "./components/filters.js";
 import {pointData, totalCost} from "./mock/mock.js";
 import TripController from "./controllers/trip.js";
@@ -22,8 +22,5 @@ render(tripControlsContainer, new FiltersComponent(), RenderPosition.BEFOREEND);
 
 const tripController = new TripController(tripEventsContainer);
 
-if (pointData.length === 0) {
-  render(tripEventsContainer, new NoPointsComponent(), RenderPosition.BEFOREEND);
-} else {
-  tripController.render(pointData);
-}
+tripController.render(pointData);
+
