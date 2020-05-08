@@ -1,17 +1,3 @@
-export const RenderPosition = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`
-};
-
-export const render = (container, element, place) => {
-  switch (place) {
-    case RenderPosition.AFTERBEGIN: container.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND: container.append(element);
-      break;
-  }
-};
-
 export const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min);
 };
@@ -73,18 +59,12 @@ export const formatDate = (date, section) => {
   const minutes = date.getMinutes();
   const options = {month: `long`};
 
-  switch (section) {
-    case `edit`: return `${day}/${month}/${year.toString().slice(-2)} ${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`;
-    case `point`: return `${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`;
-    case `day`: return `${date.toLocaleString(`en-US`, options)} ${day}`;
-    case `datetimeDay`: return `${year}-${month}-${day}`;
-  }
+  const FORMATS = {
+    edit: `${day}/${month}/${year.toString().slice(-2)} ${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
+    point: `${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
+    day: `${date.toLocaleString(`en-US`, options)} ${day}`,
+    datetimeDay: `${year}-${month}-${day}`
+  };
+
+  return FORMATS[section];
 };
-
-export const createElement = (template) => {
-  const newElement = document.createElement(`div`);
-  newElement.innerHTML = template;
-
-  return newElement.firstChild;
-};
-
