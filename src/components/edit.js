@@ -1,10 +1,13 @@
 import {formatDate} from "../utils/common.js";
-import AbstractComponent from "./abstract-component.js";
+import {editTypes} from "../mock/mock.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
 
-const createEditEventTemplate = (editData) => {
-  const {type, city, startPointDate, endPointDate, price, destination, photos, offers} = editData;
+const createEditEventTemplate = (editData, options) => {
+  const {city, startPointDate, endPointDate, price, destination, photos, offers} = editData;
+  const {type} = options;
   const formattedStartDate = formatDate(new Date(startPointDate), `edit`);
   const formattedFinishDate = formatDate(new Date(endPointDate), `edit`);
+  // const favoriteFlag = favoriteFlag ? `checked` : ``;
 
   const getEditOffers = (data) => {
     return data.map((offer, index) => {
@@ -143,6 +146,17 @@ const createEditEventTemplate = (editData) => {
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Cancel</button>
+          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" >
+          <label class="event__favorite-btn" for="event-favorite-1">
+            <span class="visually-hidden">Add to favorite</span>
+            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+            </svg>
+          </label>
+
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
         <section class="event__details">
           <section class="event__section  event__section--offers">
@@ -169,17 +183,59 @@ const createEditEventTemplate = (editData) => {
   );
 };
 
-export default class Edit extends AbstractComponent {
+// ${favoriteFlag}
+
+export default class Edit extends AbstractSmartComponent {
   constructor(data) {
     super();
     this._data = data;
+    this._type = data.type;
+    this._submitHandler = null;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._data);
+    return createEditEventTemplate(this._data, {type: this._type});
+  }
+
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setCloseHandler(this._cancelHandler);
+    this.setClickHandler(this._clickHandler);
+    this.setFavoritesButtonClickHandler(this._favoritesClickHandler);
+  }
+
+  rerender() {
+    super.rerender();
   }
 
   setSubmitHandler(handler) {
     this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
+  }
+
+  setCancelHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._cancelHandler = handler;
+  }
+
+  setClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._clickHandler = handler;
+  }
+
+  setFavoritesButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoritesClickHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
+      this._type = editTypes.get(evt.target.value);
+      this.rerender();
+    });
+
   }
 }

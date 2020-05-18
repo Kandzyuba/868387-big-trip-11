@@ -35,6 +35,20 @@ for (let i = 0; i < POINTS_AMOUNT; i++) {
 let initialValue = 0;
 let totalCost = pointData.reduce(getCost, initialValue);
 
+
+export const editTypes = new Map([
+  [`taxi`, `Taxi to`],
+  [`bus`, `Bus to`],
+  [`train`, `Train to`],
+  [`ship`, `Ship to`],
+  [`transport`, `Transport to`],
+  [`drive`, `Drive to`],
+  [`flight`, `Flight to`],
+  [`check-in`, `Check-in in`],
+  [`sightseeing`, `Sightseeing in`],
+  [`restaurant`, `Restaurant in`]
+]);
+
 pointData.sort((current, next) => current.startPointDate - next.startPointDate);
 
 
