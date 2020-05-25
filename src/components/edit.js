@@ -1,10 +1,22 @@
-import {formatDate} from "../utils/common.js";
-import AbstractComponent from "./abstract-component.js";
+import {formatDate, getRandomPhoto, getRandomItemArr, getRandomElements} from "../utils/common.js";
+import {editTypes, destinations, offerTypes, cities} from "../mock/mock.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
 
-const createEditEventTemplate = (editData) => {
-  const {type, city, startPointDate, endPointDate, price, destination, photos, offers} = editData;
+const createCitiesList = (cityNames) => {
+  return cityNames.map((cityName) => {
+    return (`<option value="${cityName}"></option>`);
+  }).join(``);
+};
+
+const createEditEventTemplate = (editData, options) => {
+  const {startPointDate, endPointDate, price} = editData;
+  const {type, city, destination, photos, offers} = options;
   const formattedStartDate = formatDate(new Date(startPointDate), `edit`);
   const formattedFinishDate = formatDate(new Date(endPointDate), `edit`);
+  const citiesList = createCitiesList(cities);
+  // const isFavorite = isFavorive ? `checked` : ``;
+
+  console.log(editData.destination);
 
   const getEditOffers = (data) => {
     return data.map((offer, index) => {
@@ -43,7 +55,7 @@ const createEditEventTemplate = (editData) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type.slice(0, -3)}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -110,14 +122,11 @@ const createEditEventTemplate = (editData) => {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${type} to
+              ${type}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
             <datalist id="destination-list-1">
-              <option value="Berlin"></option>
-              <option value="Frankfurt"></option>
-              <option value="New York"></option>
-              <option value="Berkly"></option>
+              ${citiesList}
             </datalist>
           </div>
 
@@ -143,6 +152,17 @@ const createEditEventTemplate = (editData) => {
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Cancel</button>
+          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" >
+          <label class="event__favorite-btn" for="event-favorite-1">
+            <span class="visually-hidden">Add to favorite</span>
+            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+            </svg>
+          </label>
+
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
         <section class="event__details">
           <section class="event__section  event__section--offers">
@@ -169,17 +189,80 @@ const createEditEventTemplate = (editData) => {
   );
 };
 
-export default class Edit extends AbstractComponent {
+// ${isFavorite}
+
+export default class Edit extends AbstractSmartComponent {
   constructor(data) {
     super();
     this._data = data;
+    this._offers = data.offers;
+    this._photos = data.photos;
+    this._destination = data.destination;
+    this._type = data.type;
+    this._city = data.city;
+    this._submitHandler = null;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._data);
+    return createEditEventTemplate(this._data, {
+      type: this._type,
+      city: this._city,
+      destination: this._destination,
+      offers: this._offers,
+      photos: this._photos
+    });
+  }
+
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setCancelHandler(this._cancelHandler);
+    this.setClickHandler(this._clickHandler);
+    this.setFavoritesButtonClickHandler(this._favoritesClickHandler);
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
   }
 
   setSubmitHandler(handler) {
     this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
+    this._submitHandler = handler;
+  }
+
+  setCancelHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._cancelHandler = handler;
+  }
+
+  setClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._clickHandler = handler;
+  }
+
+  setFavoritesButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoritesClickHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
+      this._type = editTypes.get(evt.target.value);
+      this.rerender();
+    });
+
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      this._city = evt.target.value;
+      this._destination = getRandomItemArr(destinations);
+      this._photos = getRandomPhoto();
+      this._offers = getRandomElements(offerTypes);
+
+      this.rerender();
+    });
+
   }
 }
