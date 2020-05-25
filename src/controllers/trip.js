@@ -6,23 +6,32 @@ import {render, RenderPosition} from "../utils/render.js";
 import PointController from "./point.js";
 
 
-const renderPoints = (points, pointDays, onDataChange, onViewChange) => {
+const renderPoints = (points, onDataChange, onViewChange) => {
 
-  pointDays.forEach((item, index) => {
+  const travelDays = [...new Set(points.map((item) => new Date(item.startPointDate).toDateString()))];
+  let pointControllers = [];
+
+  travelDays.forEach((item, index) => {
     const tripDaysList = document.querySelector(`.trip-days`);
     render(tripDaysList, new DayComponent(new Date(item), 1 + index), RenderPosition.BEFOREEND);
     const lastDay = document.querySelector(`.day:last-child`);
     const pointContainer = lastDay.querySelector(`.trip-events__list`);
 
-    let filteredArr = points.filter((element) => {
+    let daysArr = points.filter((element) => {
       return new Date(element.startPointDate).toDateString() === item;
     });
 
-    filteredArr.map((element) => {
+    const getDaysArrow = daysArr.map((element) => {
       const pointController = new PointController(pointContainer, onDataChange, onViewChange);
       pointController.render(element);
+      return pointController;
     });
+
+    pointControllers = pointControllers.concat(getDaysArrow);
+    return pointControllers;
   });
+
+  return pointControllers;
 };
 
 export default class TripController {
@@ -33,13 +42,13 @@ export default class TripController {
     this._tripDays = new TripDaysComponent();
     this._sortComponent = new SortComponent();
     this._onDataChange = this._onDataChange.bind(this);
-    // this._onViewChange = this._onViewChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
 
   }
 
   render(points) {
     this._points = points;
-    this._travelDays = [...new Set(points.map((item) => new Date(item.startPointDate).toDateString()))];
+
 
     const container = this._container;
     render(container, this._sortComponent, RenderPosition.AFTERBEGIN);
@@ -52,8 +61,8 @@ export default class TripController {
       return;
     }
 
-    const newPoint = renderPoints(this._points, this._travelDays, this._onDataChange, this._onViewChange);
-    this._showedPointControllers = this._showedPointControllers.concat(newPoint);
+    this._showedPointControllers = renderPoints(this._points, this._onDataChange, this._onViewChange);
+    console.log(this._showedPointControllers);
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -68,7 +77,8 @@ export default class TripController {
     pointController.render(this._points[index]);
   }
 
-  // _onViewChange() {
-  //   this._showedPointControllers.forEach((item) => item.setDefaultView());
-  // }
+  _onViewChange() {
+    this._showedPointControllers.forEach((item) => item.setDefaultView());
+    console.log(this._showedPointControllers);
+  }
 }

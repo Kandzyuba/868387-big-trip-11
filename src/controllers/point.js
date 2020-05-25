@@ -2,8 +2,8 @@ import PointComponent from "../components/point.js";
 import EditComponent from "../components/edit.js";
 import {replace, render, RenderPosition} from "../utils/render.js";
 
-const eventMode = {
-  POINT: `default`,
+const EventMode = {
+  DEFAULT: `default`,
   EDIT: `edit`
 };
 
@@ -13,14 +13,14 @@ export default class PointController {
     this._pointComponent = null;
     this._editComponent = null;
     this._onDataChange = onDataChange;
-    // this._onViewChange = onViewChange;
-    this._eventMode = eventMode.POINT;
+    this._onViewChange = onViewChange;
+    this._EventMode = EventMode.DEFAULT;
     // this._onEskKeyDown = this._onEskKeyDown.bind(this);
   }
 
   render(point) {
-    // const oldPoint = this._pointComponent;
-    // const oldEdit = this._editComponent;
+    const oldPoint = this._pointComponent;
+    const oldEdit = this._editComponent;
     this._pointComponent = new PointComponent(point);
     this._editComponent = new EditComponent(point);
 
@@ -50,31 +50,31 @@ export default class PointController {
       }));
     });
 
-    // if (oldPoint && oldEdit) {
-    //   replace(this._pointComponent, oldPoint);
-    //   replace(this._editComponent, oldEdit);
-    // } else {
-    //   render(this._pointContainer, this._pointComponent, RenderPosition.BEFOREEND);
-    // }
+    if (oldPoint && oldEdit) {
+      replace(this._pointComponent, oldPoint);
+      replace(this._editComponent, oldEdit);
+    } else {
+      render(this._pointContainer, this._pointComponent, RenderPosition.BEFOREEND);
+    }
 
   }
 
-  // setDefaultView() {
-  //   if (this._eventMode !== eventMode.POINT) {
-  //     this._replaceEditToTask();
-  //   }
-  // }
+  setDefaultView() {
+    if (this._EventMode !== EventMode.DEFAULT) {
+      this._replaceEditToPoint();
+    }
+  }
 
   _replacePointToEdit() {
-    // this._onViewChange();
+    this._onViewChange();
     replace(this._editComponent, this._pointComponent);
 
-    this._eventMode = eventMode.EDIT;
+    this._EventMode = EventMode.EDIT;
   }
 
   _replaceEditToPoint() {
     replace(this._pointComponent, this._editComponent);
-    this._eventMode = eventMode.POINT;
+    this._EventMode = EventMode.DEFAULT;
   }
 
   _onEscKeyDown(evt) {

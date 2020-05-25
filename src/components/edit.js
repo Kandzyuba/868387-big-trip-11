@@ -1,13 +1,22 @@
-import {formatDate} from "../utils/common.js";
-import {editTypes} from "../mock/mock.js";
+import {formatDate, getRandomPhoto, getRandomItemArr, getRandomElements} from "../utils/common.js";
+import {editTypes, destinations, offerTypes, cities} from "../mock/mock.js";
 import AbstractSmartComponent from "./abstract-smart-component.js";
 
+const createCitiesList = (cityNames) => {
+  return cityNames.map((cityName) => {
+    return (`<option value="${cityName}"></option>`);
+  }).join(``);
+};
+
 const createEditEventTemplate = (editData, options) => {
-  const {city, startPointDate, endPointDate, price, destination, photos, offers} = editData;
-  const {type} = options;
+  const {startPointDate, endPointDate, price} = editData;
+  const {type, city, destination, photos, offers} = options;
   const formattedStartDate = formatDate(new Date(startPointDate), `edit`);
   const formattedFinishDate = formatDate(new Date(endPointDate), `edit`);
-  // const favoriteFlag = favoriteFlag ? `checked` : ``;
+  const citiesList = createCitiesList(cities);
+  // const isFavorite = isFavorive ? `checked` : ``;
+
+  console.log(editData.destination);
 
   const getEditOffers = (data) => {
     return data.map((offer, index) => {
@@ -46,7 +55,7 @@ const createEditEventTemplate = (editData, options) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type.slice(0, -3)}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -113,14 +122,11 @@ const createEditEventTemplate = (editData, options) => {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${type} to
+              ${type}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
             <datalist id="destination-list-1">
-              <option value="Berlin"></option>
-              <option value="Frankfurt"></option>
-              <option value="New York"></option>
-              <option value="Berkly"></option>
+              ${citiesList}
             </datalist>
           </div>
 
@@ -183,27 +189,38 @@ const createEditEventTemplate = (editData, options) => {
   );
 };
 
-// ${favoriteFlag}
+// ${isFavorite}
 
 export default class Edit extends AbstractSmartComponent {
   constructor(data) {
     super();
     this._data = data;
+    this._offers = data.offers;
+    this._photos = data.photos;
+    this._destination = data.destination;
     this._type = data.type;
+    this._city = data.city;
     this._submitHandler = null;
 
     this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._data, {type: this._type});
+    return createEditEventTemplate(this._data, {
+      type: this._type,
+      city: this._city,
+      destination: this._destination,
+      offers: this._offers,
+      photos: this._photos
+    });
   }
 
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
-    this.setCloseHandler(this._cancelHandler);
+    this.setCancelHandler(this._cancelHandler);
     this.setClickHandler(this._clickHandler);
     this.setFavoritesButtonClickHandler(this._favoritesClickHandler);
+    this._subscribeOnEvents();
   }
 
   rerender() {
@@ -212,6 +229,7 @@ export default class Edit extends AbstractSmartComponent {
 
   setSubmitHandler(handler) {
     this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
+    this._submitHandler = handler;
   }
 
   setCancelHandler(handler) {
@@ -234,6 +252,15 @@ export default class Edit extends AbstractSmartComponent {
 
     element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
       this._type = editTypes.get(evt.target.value);
+      this.rerender();
+    });
+
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      this._city = evt.target.value;
+      this._destination = getRandomItemArr(destinations);
+      this._photos = getRandomPhoto();
+      this._offers = getRandomElements(offerTypes);
+
       this.rerender();
     });
 
