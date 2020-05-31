@@ -1,30 +1,47 @@
 import AbstractComponent from "./abstract-component.js";
 
-const createFiltersTemplate = () => {
+const filterIdTemplate = `filter-`;
+
+const getFilterName = (id) => {
+  return id.substring(filterIdTemplate.length);
+};
+
+const getFilterLayout = (filter, isChecked) => {
+  const {name} = filter;
+
+  return (
+    `<div class="trip-filters__filter">
+      <input id="filter-${name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name}" ${isChecked ? `checked` : ``}>
+      <label class="trip-filters__filter-label" for="filter-${name}">${name}</label>
+    </div>`
+  );
+};
+
+const createFiltersTemplate = (filters) => {
+  const filterLayout = filters.map((item) => getFilterLayout(item, item.checked)).join(`\n`);
+
   return (
     `<form class="trip-filters" action="#" method="get">
-      <div class="trip-filters__filter">
-        <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked>
-        <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
-      </div>
-
-      <div class="trip-filters__filter">
-        <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future">
-        <label class="trip-filters__filter-label" for="filter-future">Future</label>
-      </div>
-
-      <div class="trip-filters__filter">
-        <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past">
-        <label class="trip-filters__filter-label" for="filter-past">Past</label>
-      </div>
-
+      ${filterLayout}
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>`
   );
 };
 
 export default class Filters extends AbstractComponent {
+  constructor(filters) {
+    super();
+    this._filters = filters;
+  }
+
   getTemplate() {
-    return createFiltersTemplate();
+    return createFiltersTemplate(this._filters);
+  }
+
+  setFilterChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, (evt) => {
+      const filterName = getFilterName(evt.target.id);
+      handler(filterName);
+    });
   }
 }

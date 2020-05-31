@@ -9,14 +9,14 @@ const createCitiesList = (cityNames) => {
 };
 
 const createEditEventTemplate = (editData, options) => {
+
+
   const {startPointDate, endPointDate, price} = editData;
   const {type, city, destination, photos, offers} = options;
   const formattedStartDate = formatDate(new Date(startPointDate), `edit`);
   const formattedFinishDate = formatDate(new Date(endPointDate), `edit`);
   const citiesList = createCitiesList(cities);
   // const isFavorite = isFavorive ? `checked` : ``;
-
-  console.log(editData.destination);
 
   const getEditOffers = (data) => {
     return data.map((offer, index) => {
@@ -55,7 +55,7 @@ const createEditEventTemplate = (editData, options) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type.slice(0, -3)}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase().slice(0, -3)}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -94,7 +94,7 @@ const createEditEventTemplate = (editData, options) => {
                 </div>
 
                 <div class="event__type-item">
-                  <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+                  <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
                   <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
                 </div>
               </fieldset>
