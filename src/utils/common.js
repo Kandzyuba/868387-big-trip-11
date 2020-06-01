@@ -92,7 +92,12 @@ export const newPoint = {
   offers: [],
   destination: ``,
   photos: [],
-  isFavorite: false
+  isFavorite: false,
+  isNew: true
+};
+
+export const protectionPrices = (data) => {
+  return data.replace(/[^+\d]/g, ``);
 };
 
 export const getFuturePoints = (points) => {

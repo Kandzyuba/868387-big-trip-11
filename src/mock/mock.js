@@ -23,7 +23,8 @@ const getpointData = () => {
     timePosition: getPointTime(new Date(endDate) - new Date(startDate)),
     offers: getRandomElements(offerTypes),
     destination: getRandomItemArr(destinations),
-    photos: getRandomPhoto()
+    photos: getRandomPhoto(),
+    isNew: false
   };
 };
 

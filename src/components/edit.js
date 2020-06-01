@@ -1,4 +1,7 @@
-import {formatDate, getRandomPhoto, getRandomItemArr, getRandomElements} from "../utils/common.js";
+import moment from "moment";
+import flatpickr from "flatpickr";
+import 'flatpickr/dist/flatpickr.min.css';
+import {formatDate, getRandomPhoto, getRandomItemArr, getRandomElements, protectionPrices} from "../utils/common.js";
 import {editTypes, destinations, offerTypes, cities} from "../mock/mock.js";
 import AbstractSmartComponent from "./abstract-smart-component.js";
 
@@ -9,9 +12,7 @@ const createCitiesList = (cityNames) => {
 };
 
 const createEditEventTemplate = (editData, options) => {
-
-
-  const {startPointDate, endPointDate, price} = editData;
+  const {startPointDate, endPointDate, price, isNew} = editData;
   const {type, city, destination, photos, offers} = options;
   const formattedStartDate = formatDate(new Date(startPointDate), `edit`);
   const formattedFinishDate = formatDate(new Date(endPointDate), `edit`);
@@ -151,18 +152,18 @@ const createEditEventTemplate = (editData, options) => {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__reset-btn" type="reset">${isNew && `Delete` || `Cancel`}</button>
           <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" >
-          <label class="event__favorite-btn" for="event-favorite-1">
+          <label class="event__favorite-btn ${isNew && `visually-hidden` || ``}" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
             </svg>
           </label>
+          ${isNew && `` || `<button class="event__rollup-btn" type="button">
+          <span class="visually-hidden">Open event</span>
+        </button>`}
 
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
         </header>
         <section class="event__details">
           <section class="event__section  event__section--offers">
@@ -201,7 +202,12 @@ export default class Edit extends AbstractSmartComponent {
     this._type = data.type;
     this._city = data.city;
     this._submitHandler = null;
+    this._deleteButtonClickHandler = null;
 
+    this._flatpickrStartDate = null;
+    this._flatpickrEndDate = null;
+
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -220,11 +226,30 @@ export default class Edit extends AbstractSmartComponent {
     this.setCancelHandler(this._cancelHandler);
     this.setClickHandler(this._clickHandler);
     this.setFavoritesButtonClickHandler(this._favoritesClickHandler);
+    this.setDeleteClickHandler(this._deleteButtonClockHandler);
     this._subscribeOnEvents();
+  }
+
+  getData() {
+    const form = this.getElement();
+    return new FormData(form);
+  }
+
+  removeElement() {
+    if (this._flatpickrStartDate || this._flatpickrEndDate) {
+      this._flatpickrStartDate.destroy();
+      this._flatpickrEndDate.destroy();
+      this._flatpickrStartDate = null;
+      this._flatpickrEndDate = null;
+      this._clickHandler = null;
+    }
+
+    super.removeElement();
   }
 
   rerender() {
     super.rerender();
+    this._applyFlatpickr();
   }
 
   setSubmitHandler(handler) {
@@ -247,6 +272,29 @@ export default class Edit extends AbstractSmartComponent {
     this._favoritesClickHandler = handler;
   }
 
+  setDeleteClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._deleteButtonClickHandler = handler;
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickrStartDate || this._flatpickrEndDate) {
+      this._flatpickrStartDate.destroy();
+      this._flatpickrEndDate.destroy();
+      this._flatpickrStartDate = null;
+      this._flatpickrEndDate = null;
+    }
+    const element = this.getElement();
+    const options = {
+      allowInput: true,
+      dateFormat: `d/m/y H:i`,
+      minDate: this._data.startPointDate,
+      enableTime: true
+    };
+    this._flatpickrStartDate = flatpickr(element.querySelector(`#event-start-time-1`), Object.assign({}, options, {defaultDate: this._data.startPointDate}));
+    this._flatpickrEndDate = flatpickr(element.querySelector(`#event-end-time-1`), Object.assign({}, options, {defaultDate: this._data.endPointDate}));
+  }
+
   _subscribeOnEvents() {
     const element = this.getElement();
 
@@ -262,6 +310,10 @@ export default class Edit extends AbstractSmartComponent {
       this._offers = getRandomElements(offerTypes);
 
       this.rerender();
+    });
+
+    element.querySelector(`.event__input--price`).addEventListener(`input`, (evt) => {
+      evt.target.value = protectionPrices(evt.target.value);
     });
 
   }
