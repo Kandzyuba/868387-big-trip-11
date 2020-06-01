@@ -68,3 +68,56 @@ export const formatDate = (date, section) => {
 
   return FORMATS[section];
 };
+
+export const FILTER_TYPES = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};
+
+export const sortTypes = {
+  EVENT: `event`,
+  TIME: `time`,
+  PRICE: `price`
+};
+
+export const newPoint = {
+  id: String(Math.floor(getRandomDate() + Math.random())),
+  type: `Bus to`,
+  city: ``,
+  price: 0,
+  startPointDate: Math.min(getRandomDate(), getRandomDate()),
+  endPointDate: Math.max(getRandomDate(), getRandomDate()),
+  timePosition: getPointTime(Math.max(getRandomDate(), getRandomDate()) - Math.min(getRandomDate(), getRandomDate())),
+  offers: [],
+  destination: ``,
+  photos: [],
+  isFavorite: false,
+  isNew: true
+};
+
+export const protectionPrices = (data) => {
+  return data.replace(/[^+\d]/g, ``);
+};
+
+export const getFuturePoints = (points) => {
+  return points.filter((point) => point.startPointDate > Date.now());
+};
+
+export const getPastPoints = (points) => {
+  return points.filter((point) => point.endPointDate < Date.now());
+};
+
+export const getFilteredPoints = (points, filterType) => {
+  switch (filterType) {
+    case FILTER_TYPES.EVERYTHING:
+      return points.sort((a, b) => a.startPointDate - b.startPointDate);
+    case FILTER_TYPES.FUTURE:
+      return getFuturePoints(points);
+    case FILTER_TYPES.PAST:
+      return getPastPoints(points);
+  }
+
+  return points;
+};
+

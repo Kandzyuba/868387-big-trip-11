@@ -14,6 +14,7 @@ const getpointData = () => {
   const endDate = getRandomDate();
 
   return {
+    id: String(new Date() + Math.random()),
     type: getRandomItemArr(types),
     city: getRandomItemArr(cities),
     price: getRandomNumber(20, 550),
@@ -22,7 +23,8 @@ const getpointData = () => {
     timePosition: getPointTime(new Date(endDate) - new Date(startDate)),
     offers: getRandomElements(offerTypes),
     destination: getRandomItemArr(destinations),
-    photos: getRandomPhoto()
+    photos: getRandomPhoto(),
+    isNew: false
   };
 };
 
@@ -49,7 +51,9 @@ export const editTypes = new Map([
   [`restaurant`, `Restaurant in`]
 ]);
 
+export const mainArticles = [`Table`, `Stats`];
+
 pointData.sort((current, next) => current.startPointDate - next.startPointDate);
 
 
-export {pointData, totalCost, cities};
+export {pointData, totalCost, cities, destinations, offerTypes};
