@@ -3,8 +3,8 @@ import DayComponent from "../components/day.js";
 import NoPointsComponent from "../components/no-points.js";
 import TripDaysComponent from "../components/trip-days.js";
 import {render, RenderPosition} from "../utils/render.js";
-import {sortTypes, newPoint} from "../utils/common.js";
-import PointController, {EventMode} from "./point.js";
+import {sortTypes} from "../utils/common.js";
+import PointController, {EventMode, newPoint} from "./point.js";
 
 
 const renderPoints = (points, onDataChange, onViewChange, isDefaultSorting = true) => {
@@ -33,11 +33,11 @@ const renderPoints = (points, onDataChange, onViewChange, isDefaultSorting = tru
 };
 
 export default class TripController {
-  constructor(container, pointsModel) {
+  constructor(container, pointsModel, api) {
     this._container = container;
     this._pointsModel = pointsModel;
     this._showedPointControllers = [];
-
+    this._api = api;
 
     this._tripDays = new TripDaysComponent();
     this._sortComponent = new SortComponent();
@@ -48,6 +48,10 @@ export default class TripController {
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
 
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
+  }
+
+  getPoints() {
+    return this._pointsModel.getPoints();
   }
 
   render() {
@@ -68,13 +72,22 @@ export default class TripController {
   }
 
   createPoint() {
+    const daysContainer = this._container.querySelector(`.trip-days`);
     if (this._creatingPoint) {
       return;
     }
 
-    this._creatingPoint = new PointController(this._container, this._onDataChange, this._onViewChange);
+    this._creatingPoint = new PointController(daysContainer, this._onDataChange, this._onViewChange);
     this._creatingPoint.render(newPoint, EventMode.CREATING);
     this._onViewChange();
+  }
+
+  hide() {
+    this._tripDays.hide();
+  }
+
+  show() {
+    this._tripDays.show();
   }
 
   _removePoints() {
@@ -96,20 +109,34 @@ export default class TripController {
         pointController.remove();
         this._updatePoint();
       } else {
-        this._pointsModel.addFilteredPoint(newData);
-        pointController.render(newData, EventMode.DEFAULT);
-
-        this._showedPointControllers = [].concat(pointController, this._pointControllers);
-        this._updatePoint();
+        this._api.createPoint(newData)
+        .then((pointModel) => {
+          this._pointsModel.addPoint(pointModel);
+          this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+          this._updatePoints();
+        }).catch(() => {
+          pointController.getAnimation();
+        });
       }
     } else if (newData === null) {
-      this._pointsModel._removePoints(oldData.id);
-      this._updatePoint();
+      this._api.deletePoint(oldData.id).then(() => {
+        this._pointsModel.removePoint(oldData.id);
+        this._updatePoints();
+      }).catch(() => {
+        pointController.getAnimation();
+      });
     } else {
-      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
-      if (isSuccess) {
-        pointController.render(newData);
-      }
+      this._api.updatePoint(oldData.id, newData)
+      .then((pointsModel) => {
+        const isSuccess = this._pointsModel.updatePoint(oldData.id, pointsModel);
+
+        if (isSuccess) {
+          // pointController.render(pointsModel, EventMode.DEFAULT);
+          this._updatePoints();
+        }
+      }).catch(() => {
+        pointController.getAnimation();
+      });
     }
   }
 

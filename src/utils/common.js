@@ -51,22 +51,36 @@ export const getCost = (accumulator, currentValue) => {
   return accumulator + currentValue.price;
 };
 
-export const formatDate = (date, section) => {
-  const year = date.getFullYear();
-  const month = (`0` + date.getMonth()).slice(-2);
-  const day = (`0` + date.getDate()).slice(-2);
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const options = {month: `long`};
+// export const formatDate = (date, section) => {
+//   const year = date.getFullYear();
+//   const month = (`0` + date.getMonth()).slice(-2);
+//   const day = (`0` + date.getDate()).slice(-2);
+//   const hours = date.getHours();
+//   const minutes = date.getMinutes();
+//   const options = {month: `long`};
 
-  const FORMATS = {
-    edit: `${day}/${month}/${year.toString().slice(-2)} ${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
-    point: `${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
-    day: `${date.toLocaleString(`en-US`, options)} ${day}`,
-    datetimeDay: `${year}-${month}-${day}`
-  };
+//   const FORMATS = {
+//     edit: `${day}/${month}/${year.toString().slice(-2)} ${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
+//     point: `${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
+//     day: `${date.toLocaleString(`en-US`, options)} ${day}`,
+//     datetimeDay: `${year}-${month}-${day}`
+//   };
 
-  return FORMATS[section];
+//   return FORMATS[section];
+// };
+
+export const getTimeDuration = (timeInMs) => {
+  const days = Math.floor(timeInMs / (1000 * 60 * 60 * 24)).toString().padStart(2, `0`);
+  const hours = (Math.floor(timeInMs / (1000 * 60 * 60)) % 24).toString().padStart(2, `0`);
+  const minutes = (Math.floor(timeInMs / (1000 * 60)) % 60).toString().padStart(2, `0`);
+  const formattedDays = days > 0 ? `${days}D ` : ``;
+  let formattedHours = `${hours}H `;
+
+  if (days === 0) {
+    formattedHours = hours > 0 ? `${hours}H ` : ``;
+  }
+
+  return `${formattedDays}${formattedHours}${minutes}M`;
 };
 
 export const FILTER_TYPES = {
@@ -81,19 +95,25 @@ export const sortTypes = {
   PRICE: `price`
 };
 
-export const newPoint = {
-  id: String(Math.floor(getRandomDate() + Math.random())),
-  type: `Bus to`,
-  city: ``,
-  price: 0,
-  startPointDate: Math.min(getRandomDate(), getRandomDate()),
-  endPointDate: Math.max(getRandomDate(), getRandomDate()),
-  timePosition: getPointTime(Math.max(getRandomDate(), getRandomDate()) - Math.min(getRandomDate(), getRandomDate())),
-  offers: [],
-  destination: ``,
-  photos: [],
-  isFavorite: false,
-  isNew: true
+export const TRANSPORT_TYPES = [
+  `taxi`,
+  `bus`,
+  `train`,
+  `ship`,
+  `transport`,
+  `drive`,
+  `flight`
+];
+
+export const ACTIVITY_TYPES = [
+  `check-in`,
+  `sightseeing`,
+  `restaurant`
+];
+
+export const FragmentType = {
+  TRANSPORT: `to`,
+  ACTIVITY: `in`
 };
 
 export const protectionPrices = (data) => {
@@ -119,5 +139,11 @@ export const getFilteredPoints = (points, filterType) => {
   }
 
   return points;
+};
+
+export const getInitialLetter = (type) => {
+  return (
+    type[0].toUpperCase() + type.slice(1, type.length)
+  );
 };
 

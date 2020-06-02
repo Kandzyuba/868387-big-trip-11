@@ -18,7 +18,7 @@ export const render = (container, component, place) => {
     case RenderPosition.BEFOREEND: container.append(component.getElement());
       break;
     case RenderPosition.AFTEREND: container.append(component.getElement());
-    break;
+      break;
   }
 };
 
