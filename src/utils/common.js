@@ -6,29 +6,6 @@ export const getRandomDate = () => {
   return Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * getRandomNumber(0, 60) * 60 * 1000;
 };
 
-export const getRandomItemArr = (arr) => {
-  return arr[Math.floor(Math.random() * arr.length)];
-};
-
-export const getRandomElements = (data) => {
-  const offersPoint = [];
-
-  for (let i = 0; i < getRandomNumber(1, 4); i++) {
-    offersPoint.push(data[i]);
-  }
-  return offersPoint;
-};
-
-export const getRandomPhoto = () => {
-  const photos = [];
-
-  for (let i = 0; i < getRandomNumber(1, 5); i++) {
-    photos.push(`http://picsum.photos/248/152?r=${Math.random()}`);
-  }
-
-  return photos;
-};
-
 export const getPointTime = (date) => {
   let delta = Math.floor(date) / 1000;
   const days = Math.floor(delta / 86400);
@@ -51,22 +28,18 @@ export const getCost = (accumulator, currentValue) => {
   return accumulator + currentValue.price;
 };
 
-export const formatDate = (date, section) => {
-  const year = date.getFullYear();
-  const month = (`0` + date.getMonth()).slice(-2);
-  const day = (`0` + date.getDate()).slice(-2);
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const options = {month: `long`};
+export const getTimeDuration = (timeInMs) => {
+  const days = Math.floor(timeInMs / (1000 * 60 * 60 * 24)).toString().padStart(2, `0`);
+  const hours = (Math.floor(timeInMs / (1000 * 60 * 60)) % 24).toString().padStart(2, `0`);
+  const minutes = (Math.floor(timeInMs / (1000 * 60)) % 60).toString().padStart(2, `0`);
+  const formattedDays = days > 0 ? `${days}D ` : ``;
+  let formattedHours = `${hours}H `;
 
-  const FORMATS = {
-    edit: `${day}/${month}/${year.toString().slice(-2)} ${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
-    point: `${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
-    day: `${date.toLocaleString(`en-US`, options)} ${day}`,
-    datetimeDay: `${year}-${month}-${day}`
-  };
+  if (days === 0) {
+    formattedHours = hours > 0 ? `${hours}H ` : ``;
+  }
 
-  return FORMATS[section];
+  return `${formattedDays}${formattedHours}${minutes}M`;
 };
 
 export const FILTER_TYPES = {
@@ -81,19 +54,25 @@ export const sortTypes = {
   PRICE: `price`
 };
 
-export const newPoint = {
-  id: String(Math.floor(getRandomDate() + Math.random())),
-  type: `Bus to`,
-  city: ``,
-  price: 0,
-  startPointDate: Math.min(getRandomDate(), getRandomDate()),
-  endPointDate: Math.max(getRandomDate(), getRandomDate()),
-  timePosition: getPointTime(Math.max(getRandomDate(), getRandomDate()) - Math.min(getRandomDate(), getRandomDate())),
-  offers: [],
-  destination: ``,
-  photos: [],
-  isFavorite: false,
-  isNew: true
+export const TRANSPORT_TYPES = [
+  `taxi`,
+  `bus`,
+  `train`,
+  `ship`,
+  `transport`,
+  `drive`,
+  `flight`
+];
+
+export const ACTIVITY_TYPES = [
+  `check-in`,
+  `sightseeing`,
+  `restaurant`
+];
+
+export const FragmentType = {
+  TRANSPORT: `to`,
+  ACTIVITY: `in`
 };
 
 export const protectionPrices = (data) => {
@@ -119,5 +98,11 @@ export const getFilteredPoints = (points, filterType) => {
   }
 
   return points;
+};
+
+export const getInitialLetter = (type) => {
+  return (
+    type[0].toUpperCase() + type.slice(1, type.length)
+  );
 };
 

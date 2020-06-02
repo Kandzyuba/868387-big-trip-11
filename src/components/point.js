@@ -1,43 +1,46 @@
-import {formatDate} from "../utils/common.js";
+import {getTimeDuration, FragmentType, TRANSPORT_TYPES, getInitialLetter} from "../utils/common.js";
+import moment from "moment";
 import AbstractComponent from "./abstract-component.js";
 
 const createPointTemplate = (point) => {
-  const {type, city, startPointDate, endPointDate, timePosition, price, offers} = point;
+  const {type, city, startPointDate, endPointDate, price, offers} = point;
 
   const getOffers = (data) => {
     return data.map((offer) => {
-      const {information, cost} = offer;
 
       return (`
           <li class="event__offer">
-            <span class="event__offer-title">${information}</span>
+            <span class="event__offer-title">${offer.title}</span>
             &plus;
-            &euro;&nbsp;<span class="event__offer-price">${cost}</span>
+            &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
           </li>
           `);
     }).join(``);
   };
 
   const pointOffers = getOffers(offers);
-  const formattedStartDate = formatDate(new Date(startPointDate), `point`);
-  const formattedFinishDate = formatDate(new Date(endPointDate), `point`);
+  const startDatetime = moment(startPointDate).format(`YYYY-MM-DDThh:mm:ss`);
+  const endDatetime = moment(endPointDate).format(`YYYY-MM-DDThh:mm:ss`);
+  const formattedStartDate = moment(startPointDate).format(`HH:mm`);
+  const formattedFinishDate = moment(endPointDate).format(`HH:mm`);
+  const timeDuration = getTimeDuration(endPointDate - startPointDate);
   const imgType = type.toLowerCase();
 
   return (
     `<li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${imgType.slice(0, -3)}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${imgType}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type.slice(0, -3)} to ${city}</h3>
+        <h3 class="event__title">${getInitialLetter(type)}  ${TRANSPORT_TYPES.includes(type) ? FragmentType.TRANSPORT : FragmentType.ACTIVITY} ${city}</h3>
 
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${formattedStartDate}</time>
+            <time class="event__start-time" datetime="${startDatetime}">${formattedStartDate}</time>
             &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">${formattedFinishDate}</time>
+            <time class="event__end-time" datetime="${endDatetime}">${formattedFinishDate}</time>
           </p>
-          <p class="event__duration">${timePosition}</p>
+          <p class="event__duration">${timeDuration}</p>
         </div>
 
         <p class="event__price">
