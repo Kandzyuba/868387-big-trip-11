@@ -77,7 +77,6 @@ export default class PointController {
 
     this._pointComponent = new PointComponent(point);
     this._editComponent = new EditComponent(point);
-
     const container = this._container;
 
     render(container, this._pointComponent, RenderPosition.BEFOREEND);

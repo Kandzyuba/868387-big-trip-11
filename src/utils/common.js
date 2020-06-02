@@ -6,29 +6,6 @@ export const getRandomDate = () => {
   return Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * getRandomNumber(0, 60) * 60 * 1000;
 };
 
-export const getRandomItemArr = (arr) => {
-  return arr[Math.floor(Math.random() * arr.length)];
-};
-
-export const getRandomElements = (data) => {
-  const offersPoint = [];
-
-  for (let i = 0; i < getRandomNumber(1, 4); i++) {
-    offersPoint.push(data[i]);
-  }
-  return offersPoint;
-};
-
-export const getRandomPhoto = () => {
-  const photos = [];
-
-  for (let i = 0; i < getRandomNumber(1, 5); i++) {
-    photos.push(`http://picsum.photos/248/152?r=${Math.random()}`);
-  }
-
-  return photos;
-};
-
 export const getPointTime = (date) => {
   let delta = Math.floor(date) / 1000;
   const days = Math.floor(delta / 86400);
@@ -50,24 +27,6 @@ export const getPointTime = (date) => {
 export const getCost = (accumulator, currentValue) => {
   return accumulator + currentValue.price;
 };
-
-// export const formatDate = (date, section) => {
-//   const year = date.getFullYear();
-//   const month = (`0` + date.getMonth()).slice(-2);
-//   const day = (`0` + date.getDate()).slice(-2);
-//   const hours = date.getHours();
-//   const minutes = date.getMinutes();
-//   const options = {month: `long`};
-
-//   const FORMATS = {
-//     edit: `${day}/${month}/${year.toString().slice(-2)} ${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
-//     point: `${(`0` + hours).slice(-2)}:${(`0` + minutes).slice(-2)}`,
-//     day: `${date.toLocaleString(`en-US`, options)} ${day}`,
-//     datetimeDay: `${year}-${month}-${day}`
-//   };
-
-//   return FORMATS[section];
-// };
 
 export const getTimeDuration = (timeInMs) => {
   const days = Math.floor(timeInMs / (1000 * 60 * 60 * 24)).toString().padStart(2, `0`);

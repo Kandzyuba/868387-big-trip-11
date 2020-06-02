@@ -131,8 +131,7 @@ export default class TripController {
         const isSuccess = this._pointsModel.updatePoint(oldData.id, pointsModel);
 
         if (isSuccess) {
-          // pointController.render(pointsModel, EventMode.DEFAULT);
-          this._updatePoints();
+          pointController.render(pointsModel, EventMode.DEFAULT);
         }
       }).catch(() => {
         pointController.getAnimation();

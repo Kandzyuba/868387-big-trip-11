@@ -1,8 +1,5 @@
-
-// import InfoComponent from "./components/information.js";
 import MenuComponent, {MenuItem} from "./components/menu.js";
 import FilterController from "./controllers/filter.js";
-import {pointData, mainArticles} from "./mock/mock.js";
 import TripController from "./controllers/trip.js";
 import InfoController from "./controllers/info.js";
 import {render, RenderPosition} from "./utils/render.js";
@@ -12,6 +9,7 @@ import API from "./api.js";
 
 const AUTHORIZATION = `Basic hjksldfhjosijfeipo=`;
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
+const mainArticles = [`Table`, `Stats`];
 
 const tripMainContainer = document.querySelector(`.trip-main`);
 const tripControlsContainer = document.querySelector(`.trip-controls`);
@@ -22,7 +20,6 @@ render(tripControlsContainer, menuComponent, RenderPosition.BEFOREEND);
 
 const api = new API(END_POINT, AUTHORIZATION);
 const pointsModel = new PointsModel();
-// pointsModel.setPoints(pointData);
 
 const tripController = new TripController(tripEventsContainer, pointsModel, api);
 
@@ -35,8 +32,6 @@ filterController.render();
 
 const infoController = new InfoController(tripMainContainer, pointsModel);
 infoController.render();
-
-// tripController.render(pointData);
 
 const pageMain = document.querySelector(`.page-main .page-body__container`);
 

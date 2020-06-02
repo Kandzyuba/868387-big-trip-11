@@ -15,8 +15,8 @@ export default class Point {
   toRAW() {
     return {
       'base_price': this.price,
-      'date_from': this.start.toISOString(),
-      'date_to': this.end.toISOString(),
+      'date_from': this.startPointDate.toISOString(),
+      'date_to': this.endPointDate.toISOString(),
       'destination': {
         'pictures': this.photos,
         'description': this.description,

@@ -1,8 +1,7 @@
 import moment from "moment";
 import flatpickr from "flatpickr";
 import 'flatpickr/dist/flatpickr.min.css';
-import {getRandomPhoto, getRandomItemArr, getRandomElements, TRANSPORT_TYPES, ACTIVITY_TYPES, FragmentType, getInitialLetter, protectionPrices} from "../utils/common.js";
-// import {destinations, offerTypes, CITIES, getRandomCities} from "../mock/mock.js";
+import {TRANSPORT_TYPES, ACTIVITY_TYPES, FragmentType, getInitialLetter, protectionPrices} from "../utils/common.js";
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import Store from '../models/store-model.js';
 
@@ -119,7 +118,7 @@ const createEditEventTemplate = (editData, options) => {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
-          <button class="event__reset-btn" type="reset">${isNew && deleteButtonText || `Cancel`}</button>
+          <button class="event__reset-btn" type="reset">${isNew && `Cancel` || deleteButtonText}</button>
           <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favoriteTemplate}>
           <label class="event__favorite-btn ${isNew && `visually-hidden` || ``}" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
@@ -127,31 +126,29 @@ const createEditEventTemplate = (editData, options) => {
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
             </svg>
           </label>
-          ${isNew && `` || `<button class="event__rollup-btn" type="button">
+          ${isNew ? `` : `<button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>`}
 
         </header>
-        <section class="event__details">
-          <section class="event__section  event__section--offers">
+        ${offers.length > 0 || description.length > 0 ? `<section class="event__details">
+          ${offers.length >= 0 ? `<section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
               ${editOffers}
             </div>
-          </section>
-
-          <section class="event__section  event__section--destination">
+          </section>` : ``}
+          ${description.length > 0 ? `<section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
             <p class="event__destination-description">${description}</p>
-
-            <div class="event__photos-container">
+            ${photos.length > 0 ? `<div class="event__photos-container">
               <div class="event__photos-tape">
                 ${photoTemplate}
               </div>
-            </div>
-          </section>
-        </section>
+            </div>` : ``}
+          </section>` : ``}
+        </section>` : ``}
       </form>
     </li>`
   );
@@ -199,7 +196,7 @@ export default class Edit extends AbstractSmartComponent {
   }
 
   getData() {
-    const form = this.getElement();
+    const form = this.getElement().querySelector(`.trip-events__item`);
     return new FormData(form);
   }
 
@@ -209,7 +206,7 @@ export default class Edit extends AbstractSmartComponent {
   }
 
   disableForm() {
-    const form = this.getElement();
+    const form = this.getElement().querySelector(`.trip-events__item`);
     const elements = Array.from(form.elements);
     elements.forEach((item) => {
       item.readOnly = true;
@@ -217,7 +214,7 @@ export default class Edit extends AbstractSmartComponent {
   }
 
   activeForm() {
-    const form = this.getElement();
+    const form = this.getElement().querySelector(`.trip-events__item`);
     const elements = Array.from(form.elements);
     elements.forEach((item) => {
       item.readOnly = false;
